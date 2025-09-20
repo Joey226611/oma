@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GymCoach — jouw vriendelijke coach</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1: #0f1724;
+      --bg2: #0b1220;
+      --card: rgba(255,255,255,0.04);
+      --accent: linear-gradient(90deg,#7c3aed,#06b6d4);
+      --glass: rgba(255,255,255,0.03);
+      --muted: rgba(255,255,255,0.6);
+      --success: #16a34a;
+      --danger: #dc2626;
+      --soft: 12px;
+      --glass-border: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(99,102,241,0.08), transparent 10%),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:28px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Container */
+    .shell{
+      width:100%;
+      max-width:1100px;
+      margin:auto;
+      border-radius:18px;
+      padding:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 10px 40px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      overflow:hidden;
+    }
+
+    header{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:16px;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;
+      background:var(--accent);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.18);
+      font-weight:800;font-size:18px;
+    }
+    h1{margin:0;font-size:20px}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    main{display:grid;grid-template-columns:320px 1fr;gap:18px}
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;padding:14px;border:1px solid var(--glass-border);
+    }
+
+    /* left menu */
+    .ex-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .ex-item{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px;border-radius:10px;cursor:pointer;
+      transition:all .18s ease;
+      border:1px solid transparent;
+    }
+    .ex-item:hover{transform:translateY(-3px);background:rgba(255,255,255,0.02)}
+    .ex-item.active{
+      background:linear-gradient(90deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06));
+      border-color: rgba(124,58,237,0.28);
+      box-shadow: 0 6px 16px rgba(7,10,29,0.6);
+    }
+    .ex-item .meta{font-size:13px;color:var(--muted)}
+
+    .levels{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .level{
+      display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;cursor:pointer;border:1px solid transparent;
+    }
+    .level:hover{background:rgba(255,255,255,0.02)}
+    .level input{accent-color:#7c3aed}
+
+    .small{font-size:12px;color:var(--muted)}
+
+    /* right area */
+    .plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+    .stat{
+      background:var(--card);padding:12px;border-radius:10px;border:1px solid var(--glass-border);
+    }
+    .controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+    .btn{
+      padding:10px 14px;border-radius:12px;border:none;cursor:pointer;font-weight:600;
+      transition:transform .12s ease, box-shadow .12s ease;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.start{background:linear-gradient(90deg,#10b981,#059669);color:white}
+    .btn.pause{background:linear-gradient(90deg,#f59e0b,#f97316);color:white}
+    .btn.stop{background:linear-gradient(90deg,#ef4444,#b91c1c);color:white}
+    .btn.alt{background:rgba(255,255,255,0.04);color:var(--muted)}
+
+    .timer{
+      margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:space-between;
+    }
+    .big{font-size:28px;font-weight:800}
+    .muted{color:var(--muted)}
+    .note{font-size:13px;color:var(--muted);margin-top:10px}
+
+    /* spotify */
+    .spotify-embed{border-radius:8px;overflow:hidden;border:1px solid var(--glass-border);margin-top:8px}
+
+    /* history */
+    .history{max-height:220px;overflow:auto;margin-top:6px;display:flex;flex-direction:column;gap:8px}
+    .hist-item{padding:8px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid var(--glass-border);font-size:13px}
+
+    /* responsive */
+    @media (max-width:900px){
+      main{grid-template-columns:1fr;gap:12px}
+      .brand{gap:8px}
+      .logo{width:44px;height:44px;font-size:16px}
+    }
+
+    /* small animations */
+    .fade-in{animation:fadeIn .45s ease both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+    .pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-weight:600}
+    .help{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="shell fade-in" role="application" aria-label="GymCoach web app">
+    <header>
+      <div class="brand">
+        <div class="logo">GC</div>
+        <div>
+          <h1>GymCoach — jouw vriendelijke coach</h1>
+          <p class="lead">Langzaam opbouwen, duidelijke uitleg en motivaties. Kies een oefening en start.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="pill" id="session-count">Sessies: 0</div>
+        <button class="btn alt" id="helpBtn" title="Hulp">Hulp</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- LEFT: controls -->
+      <aside class="panel" aria-label="Keuzes en instellingen">
+        <h3 style="margin:0">Kies een oefening</h3>
+        <div class="ex-list" id="exercises"></div>
+
+        <h3 style="margin-top:12px;margin-bottom:6px">Ervaring</h3>
+        <div class="levels" id="levels"></div>
+
+        <div style="margin-top:12px">
+          <div class="small">Notities</div>
+          <textarea id="notes" style="width:100%;margin-top:8px;padding:10px;border-radius:8px;background:transparent;border:1px solid var(--glass-border);min-height:70px;color:inherit"></textarea>
+        </div>
+      </aside>
+
+      <!-- RIGHT: plan and trainer -->
+      <section class="panel" aria-live="polite">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <div class="muted" id="plan-for">Plan voor: —</div>
+            <div style="font-size:18px;font-weight:700" id="plan-title">Selecteer oefening</div>
+            <div class="help" id="plan-desc">Kies een oefening en niveau. De coach past de sets/reps aan.</div>
+          </div>
+
+          <div style="text-align:right">
+            <div class="muted small">Huidige set</div>
+            <div style="font-weight:800;font-size:18px" id="current-set">0 / 0</div>
+            <div class="muted small" style="margin-top:6px">Timer</div>
+            <div class="muted big" id="current-timer">0:00</div>
+          </div>
+        </div>
+
+        <div class="plan-grid">
+          <div class="stat">
+            <div class="small">Sets</div>
+            <div style="font-weight:800;font-size:20px" id="plan-sets">—</div>
+          </div>
+          <div class="stat">
+            <div class="small" id="plan-kind-label">Herhalingen</div>
+            <div style="font-weight:800;font-size:20px" id="plan-reps">—</div>
+          </div>
+          <div class="stat">
+            <div class="small">Rust (s)</div>
+            <div style="font-weight:800;font-size:20px" id="plan-rest">—</div>
+          </div>
+          <div class="stat">
+            <div class="small">Progressie advies</div>
+            <div style="font-weight:700" class="muted">Elke 2 sessies iets zwaarder</div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn start" id="startBtn">Start</button>
+          <button class="btn pause" id="pauseBtn" disabled>Pauzeer</button>
+          <button class="btn stop" id="stopBtn" title="Noods-stop">Stop (nood)</button>
+          <button class="btn alt" id="switchBtn">Iets anders</button>
+          <button class="btn alt" id="completeSetBtn" title="Gebruik deze als je reps hebt gedaan">Voltooid</button>
+        </div>
+
+        <div class="timer" role="status" aria-live="polite">
+          <div>
+            <div class="muted">Motivatie</div>
+            <div id="motivation" style="font-weight:700;margin-top:6px">Klaar om te starten — focus op techniek!</div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted small">Laatste sessie</div>
+            <div id="last-session" class="muted">—</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:12px;margin-top:12px">
+          <div>
+            <h4 style="margin:0 0 8px 0">Spotify</h4>
+            <div style="display:flex;gap:8px">
+              <input id="spotifyInput" placeholder="Plak spotify link of URI" style="flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid var(--glass-border);color:inherit" />
+              <button class="btn alt" id="saveSpotify">Opslaan</button>
+            </div>
+            <div class="spotify-embed" id="spotifyWrap" style="margin-top:8px;min-height:80px;display:flex;align-items:center;justify-content:center">
+              <div class="muted small">Plak een geldige Spotify link of URI om een embed te zien.</div>
+            </div>
+
+            <div style="margin-top:12px">
+              <h4 style="margin:0 0 8px 0">Uitleg & tips</h4>
+              <div class="note" id="explanation">
+                De coach bouwt langzaam op afhankelijk van je niveau en hoeveel sessies je al gedaan hebt. Gebruik <strong>Voltooid</strong> als je een set af hebt bij oefeningen op herhalingen. Voor planken (tijd) wordt een timer gebruikt.
+              </div>
+            </div>
+          </div>
+
+          <aside>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h4 style="margin:0">Recente sessies</h4>
+              <button class="btn alt" id="clearHistory">Wis</button>
+            </div>
+            <div class="history" id="history"></div>
+          </aside>
+        </div>
+
+      </section>
+    </main>
+
+    <footer style="margin-top:12px;text-align:center;color:var(--muted);font-size:12px">
+      Gemaakt met liefde — langzaam opbouwen werkt het beste. Push to GitHub en zet Pages aan om te hosten.
+    </footer>
+  </div>
+
+<script>
+/*
+  GymCoach - Vanilla JS single file app
+  - LocalStorage keys: gym_user_data, gym_level, gym_spotify
+  - Exercises: pushups, situps, plank, squats, burpees
+  - Handles reps-based and time-based exercises
+  - Progressive overload: sessions influence reps/duration slowly
+*/
+
+(() => {
+  // --- Data & constants ---
+  const EXERCISES = [
+    { id: 'pushups', name: 'Opdrukken', type: 'reps' },
+    { id: 'situps', name: 'Sit-ups', type: 'reps' },
+    { id: 'plank', name: 'Planken', type: 'time' },
+    { id: 'squats', name: 'Squats', type: 'reps' },
+    { id: 'burpees', name: 'Burpees', type: 'reps' }
+  ];
+
+  const LEVELS = [
+    { id: 'beginner', name: 'Nieuw', factor: 0.6, desc: 'Rustig beginnen, focus op techniek.' },
+    { id: 'trained', name: 'Getraint', factor: 1.0, desc: 'Ervaring, meer volume.' },
+    { id: 'muscle', name: 'Muscle guy', factor: 1.4, desc: 'Massa en kracht.' },
+    { id: 'strongest', name: 'Sterkste persoon op aarde', factor: 1.9, desc: 'Topniveau maar nog steeds veilig.' }
+  ];
+
+  const STORAGE_KEY = 'gym_user_data_v1';
+  const LEVEL_KEY = 'gym_level_v1';
+  const SPOTIFY_KEY = 'gym_spotify_v1';
+
+  // --- Elements ---
+  const exList = document.getElementById('exercises');
+  const levelsDiv = document.getElementById('levels');
+  const planTitle = document.getElementById('plan-title');
+  const planFor = document.getElementById('plan-for');
+  const planDesc = document.getElementById('plan-desc');
+  const planSets = document.getElementById('plan-sets');
+  const planReps = document.getElementById('plan-reps');
+  const planRest = document.getElementById('plan-rest');
+  const planKindLabel = document.getElementById('plan-kind-label');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const switchBtn = document.getElementById('switchBtn');
+  const completeSetBtn = document.getElementById('completeSetBtn');
+  const currentSet = document.getElementById('current-set');
+  const currentTimer = document.getElementById('current-timer');
+  const motivationEl = document.getElementById('motivation');
+  const notesEl = document.getElementById('notes');
+  const sessionCount = document.getElementById('session-count');
+  const historyWrap = document.getElementById('history');
+  const lastSession = document.getElementById('last-session');
+  const spotifyInput = document.getElementById('spotifyInput');
+  const spotifyWrap = document.getElementById('spotifyWrap');
+  const saveSpotify = document.getElementById('saveSpotify');
+  const explanation = document.getElementById('explanation');
+  const clearHistory = document.getElementById('clearHistory');
+
+  // state
+  let userData = loadUserData();
+  let selectedExerciseId = EXERCISES[0].id;
+  let selectedLevelId = localStorage.getItem(LEVEL_KEY) || 'beginner';
+  let plan = null;
+  let timers = { interval: null, remaining: 0 };
+  let currentRound = 0;
+  let sessionActive = false;
+  let spotifyURI = localStorage.getItem(SPOTIFY_KEY) || '';
+  let lastSavedNotes = '';
+
+  // --- Init UI ---
+  function init(){
+    // render exercises
+    EXERCISES.forEach(ex => {
+      const btn = document.createElement('div');
+      btn.className = 'ex-item';
+      btn.dataset.id = ex.id;
+      btn.innerHTML = `<div>
+                        <div style="font-weight:700">${ex.name}</div>
+                        <div class="meta">${ex.type === 'time' ? 'Duur' : 'Herhalingen'}</div>
+                      </div>
+                      <div class="muted small">${ex.type === 'time' ? '⏱️' : '💪'}</div>`;
+      btn.addEventListener('click', () => {
+        stopWorkout();
+        selectedExerciseId = ex.id;
+        render();
+      });
+      exList.appendChild(btn);
+    });
+
+    // render levels
+    LEVELS.forEach(l => {
+      const wrap = document.createElement('label');
+      wrap.className = 'level';
+      wrap.innerHTML = `<input type="radio" name="level" value="${l.id}" ${l.id === selectedLevelId ? 'checked' : ''} />
+                        <div>
+                          <div style="font-weight:700">${l.name}</div>
+                          <div class="small">${l.desc}</div>
+                        </div>`;
+      wrap.querySelector('input').addEventListener('change', ()=>{
+        selectedLevelId = l.id;
+        localStorage.setItem(LEVEL_KEY, selectedLevelId);
+        stopWorkout();
+        render();
+      });
+      levelsDiv.appendChild(wrap);
+    });
+
+    // load notes
+    notesEl.value = (loadUserData().lastNotes || '');
+    lastSavedNotes = notesEl.value;
+
+    // spotify
+    spotifyInput.value = spotifyURI;
+    renderSpotify();
+
+    // button events
+    startBtn.addEventListener('click', startOrResume);
+    pauseBtn.addEventListener('click', pauseWorkout);
+    stopBtn.addEventListener('click', () => {
+      // emergency stop
+      stopWorkout();
+      showToast('Workout gestopt', 'danger');
+    });
+    switchBtn.addEventListener('click', () => {
+      // switch to next exercise
+      const i = EXERCISES.findIndex(e => e.id === selectedExerciseId);
+      const next = EXERCISES[(i+1) % EXERCISES.length].id;
+      stopWorkout();
+      selectedExerciseId = next;
+      render();
+    });
+    completeSetBtn.addEventListener('click', onCompleteSet);
+    saveSpotify.addEventListener('click', ()=> {
+      spotifyURI = spotifyInput.value.trim();
+      localStorage.setItem(SPOTIFY_KEY, spotifyURI);
+      renderSpotify();
+      showToast('Spotify opgeslagen', 'success');
+    });
+    clearHistory.addEventListener('click', ()=> {
+      if (confirm('Wis alle opgeslagen sessies?')) {
+        userData.history = [];
+        userData.sessions = 0;
+        saveUserData();
+        render();
+      }
+    });
+
+    // periodic save of notes
+    notesEl.addEventListener('input', ()=> {
+      if (notesEl.value !== lastSavedNotes) {
+        lastSavedNotes = notesEl.value;
+        userData.lastNotes = lastSavedNotes;
+        saveUserData();
+      }
+    });
+
+    render();
+  }
+
+  // --- Persistence ---
+  function loadUserData(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e){}
+    return { sessions: 0, history: [], lastNotes: '' };
+  }
+  function saveUserData(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+    sessionCount.textContent = 'Sessies: ' + (userData.sessions || 0);
+  }
+
+  // --- Plan generator (progressive but safe) ---
+  function generatePlan(exId, lvlId){
+    const ex = EXERCISES.find(e=>e.id===exId);
+    const lvl = LEVELS.find(l=>l.id===lvlId) || LEVELS[0];
+    // base templates
+    const base = {
+      reps: { sets: 3, reps: 8, rest: 60 },
+      time: { sets: 3, duration: 20, rest: 45 }
+    };
+    const template = ex.type === 'time' ? base.time : base.reps;
+
+    const sessions = userData.sessions || 0;
+    // progression factor grows slowly with sessions, 0..~1
+    const progressionFactor = 1 + Math.min(0.12 * Math.floor(sessions / 2), 1);
+    const levelFactor = lvl.factor;
+
+    const sets = Math.max(1, Math.round(template.sets * levelFactor));
+    const repsOrDuration = ex.type === 'time'
+      ? Math.max(10, Math.round(template.duration * levelFactor * progressionFactor))
+      : Math.max(1, Math.round(template.reps * levelFactor * progressionFactor));
+    const rest = Math.max(12, Math.round(template.rest / (1 + Math.floor(sessions/6)*0.05)));
+
+    return {
+      exercise: ex,
+      level: lvl,
+      sets,
+      repsOrDuration,
+      rest,
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  // --- Render functions ---
+  function render(){
+    // highlight selected exercise
+    document.querySelectorAll('.ex-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === selectedExerciseId);
+    });
+
+    plan = generatePlan(selectedExerciseId, selectedLevelId);
+    planTitle.textContent = plan.exercise.name;
+    planFor.textContent = `Voor: ${plan.exercise.name} — Niveau: ${plan.level.name}`;
+    planDesc.textContent = plan.level.desc;
+    planSets.textContent = plan.sets;
+    planRest.textContent = plan.rest;
+    planKindLabel.textContent = plan.exercise.type === 'time' ? 'Duur (s)' : 'Herhalingen';
+    planReps.textContent = plan.repsOrDuration;
+    currentSet.textContent = `${currentRound} / ${plan.sets}`;
+    currentTimer.textContent = formatTime(timers.remaining || 0);
+
+    motivationEl.textContent = motivationText(userData.sessions || 0);
+    sessionCount.textContent = 'Sessies: ' + (userData.sessions || 0);
+
+    // history
+    renderHistory();
+
+    // last session
+    if (userData.history && userData.history.length) {
+      lastSession.textContent = new Date(userData.history[0].when).toLocaleString();
+    } else {
+      lastSession.textContent = '—';
+    }
+  }
+
+  function renderHistory(){
+    historyWrap.innerHTML = '';
+    (userData.history || []).slice(0,10).forEach(h => {
+      const el = document.createElement('div');
+      el.className = 'hist-item';
+      const exName = EXERCISES.find(e=>e.id===h.exercise)?.name || h.exercise;
+      el.innerHTML = `<div style="font-weight:700">${exName} — ${h.level}</div>
+                      <div class="small">${new Date(h.when).toLocaleString()}</div>
+                      <div class="small" style="margin-top:6px;color:var(--muted)">${h.notes || ''}</div>`;
+      historyWrap.appendChild(el);
+    });
+  }
+
+  function renderSpotify(){
+    spotifyWrap.innerHTML = '';
+    if (!spotifyURI) {
+      spotifyWrap.innerHTML = '<div class="muted small">Plak een geldige Spotify link of URI om een embed te zien.</div>';
+      return;
+    }
+    const embed = spotifyEmbedUrl(spotifyURI);
+    if (!embed) {
+      spotifyWrap.innerHTML = '<div class="muted small">Ongeldige Spotify link / URI.</div>';
+      return;
+    }
+    const iframe = document.createElement('iframe');
+    iframe.width = '100%';
+    iframe.height = '80';
+    iframe.frameBorder = '0';
+    iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+    iframe.src = embed;
+    spotifyWrap.appendChild(iframe);
+  }
+
+  // --- Timer and control logic ---
+  function startOrResume(){
+    // if not active, start a set
+    if (!plan) return;
+    if (!sessionActive) {
+      // If a time-based set (plank), start countdown for that duration.
+      if (plan.exercise.type === 'time') {
+        startTimeSet(plan.repsOrDuration);
+      } else {
+        // reps-based: we treat 'start' as allowing user to do reps and then press 'Voltooid'
+        currentRound = currentRound + 1;
+        sessionActive = true;
+        timers.remaining = 0;
+        updateButtons();
+        currentSet.textContent = `${currentRound} / ${plan.sets}`;
+        showToast(`Set ${currentRound} gestart — voer je ${plan.repsOrDuration} ${plan.exercise.type==='time'?'seconden':'reps'} uit`, 'success');
+        // auto-save notes
+        saveNotesToUser();
+      }
+    } else {
+      // currently active and paused? resume for time-based sets
+      if (timers.interval && timers.remaining > 0) {
+        // already running
+        return;
+      }
+      if (plan.exercise.type === 'time' && timers.remaining > 0) {
+        continueTimer();
+      }
+    }
+  }
+
+  function startTimeSet(seconds){
+    // start a timed set (for planken)
+    clearInterval(timers.interval);
+    timers.remaining = seconds;
+    currentRound = currentRound + 1;
+    sessionActive = true;
+    updateButtons();
+    currentSet.textContent = `${currentRound} / ${plan.sets}`;
+    runCountdown();
+    saveNotesToUser();
+  }
+
+  function runCountdown(){
+    updateTimerUI();
+    timers.interval = setInterval(()=> {
+      timers.remaining = Math.max(0, timers.remaining - 1);
+      updateTimerUI();
+      if (timers.remaining <= 0) {
+        clearInterval(timers.interval);
+        timers.interval = null;
+        // go to rest
+        startRest();
+      }
+    }, 1000);
+  }
+
+  function continueTimer(){
+    if (timers.interval) return;
+    timers.interval = setInterval(()=> {
+      timers.remaining = Math.max(0, timers.remaining - 1);
+      updateTimerUI();
+      if (timers.remaining <= 0) {
+        clearInterval(timers.interval); timers.interval = null; startRest();
+      }
+    }, 1000);
+    updateButtons();
+  }
+
+  function startRest(){
+    timers.remaining = plan.rest;
+    updateTimerUI();
+    timers.interval = setInterval(()=> {
+      timers.remaining = Math.max(0, timers.remaining - 1);
+      updateTimerUI();
+      if (timers.remaining <= 0) {
+        clearInterval(timers.interval);
+        timers.interval = null;
+        if (currentRound < plan.sets) {
+          // next set
+          if (plan.exercise.type === 'time') {
+            startTimeSet(plan.repsOrDuration);
+          } else {
+            // for reps-based start new set and wait for user to press Voltooid
+            currentRound = currentRound + 1;
+            updateButtons();
+            currentSet.textContent = `${currentRound} / ${plan.sets}`;
+            showToast(`Set ${currentRound} gestart — voer je reps uit`, 'info');
+          }
+        } else {
+          finishSession();
+        }
+      }
+    }, 1000);
+    updateButtons();
+  }
+
+  function pauseWorkout(){
+    if (timers.interval) {
+      clearInterval(timers.interval);
+      timers.interval = null;
+    }
+    sessionActive = false;
+    updateButtons();
+    showToast('Pauze', 'info');
+  }
+
+  function stopWorkout(){
+    if (timers.interval) { clearInterval(timers.interval); timers.interval = null; }
+    sessionActive = false;
+    timers.remaining = 0;
+    currentRound = 0;
+    updateButtons();
+    currentSet.textContent = `${currentRound} / ${plan?plan.sets:0}`;
+    updateTimerUI();
+  }
+
+  function onCompleteSet(){
+    // only valid for reps exercises
+    if (!plan || plan.exercise.type === 'time') return;
+    if (!sessionActive) return;
+    // if currentRound < plan.sets, start rest then wait for next set
+    if (currentRound < plan.sets) {
+      timers.remaining = plan.rest;
+      updateTimerUI();
+      // start rest countdown
+      clearInterval(timers.interval);
+      timers.interval = setInterval(()=> {
+        timers.remaining = Math.max(0, timers.remaining - 1);
+        updateTimerUI();
+        if (timers.remaining <= 0) {
+          clearInterval(timers.interval); timers.interval = null;
+          if (currentRound < plan.sets) {
+            // next set
+            // we keep sessionActive true; user must press Voltooid again when they've done reps
+            showToast(`Nieuwe set ${currentRound+1} — voer reps uit`, 'info');
+            currentRound = currentRound + 1;
+            currentSet.textContent = `${currentRound} / ${plan.sets}`;
+          } else {
+            finishSession();
+          }
+        }
+      }, 1000);
+    } else {
+      finishSession();
+    }
+  }
+
+  function finishSession(){
+    // save session
+    const entry = {
+      exercise: plan.exercise.id,
+      level: plan.level.id,
+      sets: plan.sets,
+      repsOrDuration: plan.repsOrDuration,
+      when: new Date().toISOString(),
+      notes: notesEl.value || ''
+    };
+    userData.history = [entry, ...(userData.history || [])].slice(0, 50);
+    userData.sessions = (userData.sessions || 0) + 1;
+    saveUserData();
+    sessionActive = false;
+    timers.remaining = 0;
+    currentRound = 0;
+    updateButtons();
+    render();
+    showToast('Mooi gedaan! Sessie opgeslagen.', 'success');
+  }
+
+  function updateButtons(){
+    pauseBtn.disabled = !sessionActive;
+    if (sessionActive) {
+      startBtn.textContent = 'Start / Hervat';
+      startBtn.disabled = false;
+      completeSetBtn.style.display = plan && plan.exercise.type==='reps' ? 'inline-block' : 'none';
+    } else {
+      startBtn.textContent = 'Start';
+      completeSetBtn.style.display = 'none';
+    }
+  }
+
+  function updateTimerUI(){
+    currentTimer.textContent = formatTime(timers.remaining || 0);
+    currentSet.textContent = `${currentRound} / ${plan?plan.sets:0}`;
+  }
+
+  // --- Helpers ---
+  function formatTime(sec){
+    const m = Math.floor(sec/60);
+    const s = sec%60;
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  function motivationText(sessions){
+    if (sessions < 3) return 'Top start! Focus op techniek, niet op snelheid.';
+    if (sessions < 10) return 'Goed bezig — kleine stapjes, grote winst.';
+    if (sessions < 30) return 'Awesome progress, je wordt sterker! Blijf consistent.';
+    return 'Je bent een beest — blijf slim trainen en herstellen.';
+  }
+
+  function spotifyEmbedUrl(uri){
+    if (!uri) return '';
+    try {
+      if (uri.startsWith('spotify:')) {
+        const parts = uri.split(':'); // spotify:track:ID
+        if (parts.length >= 3) return `https://open.spotify.com/embed/${parts[1]}/${parts[2]}`;
+      }
+      const u = new URL(uri);
+      if (u.hostname.includes('spotify.com')) {
+        // path like /track/{id} or /playlist/{id}
+        const parts = u.pathname.split('/').filter(Boolean);
+        if (parts.length >= 2) return `https://open.spotify.com/embed/${parts[0]}/${parts[1]}`;
+      }
+    } catch(e){}
+    return '';
+  }
+
+  function showToast(msg, type='info'){
+    // small ephemeral message in motivation area
+    const prev = motivationEl.textContent;
+    motivationEl.textContent = msg;
+    setTimeout(()=> {
+      motivationEl.textContent = motivationText(userData.sessions || 0);
+    }, 2800);
+  }
+
+  function saveNotesToUser(){
+    userData.lastNotes = notesEl.value || '';
+    saveUserData();
+  }
+
+  // --- start ---
+  init();
+  render();
+
+  // expose a small API on window for debugging (optional)
+  window.GymCoach = {
+    getUserData: ()=>userData,
+    reset: ()=>{ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(SPOTIFY_KEY); localStorage.removeItem(LEVEL_KEY); location.reload(); }
+  };
+})();
+</script>
+</body>
+</html>
